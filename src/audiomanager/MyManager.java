@@ -137,6 +137,14 @@ public final class MyManager extends com.jasonpercus.plugincreator.EventManager 
                 }
             }
         }
+        if(event.action.equals("set")){
+            int value = getValue(event.payload.settings, builder);
+            value = Audio.set(value);
+            synchronized(All_ACTIONS){
+                for(Context c : All_ACTIONS)
+                    setTitle(c, value + "%", Target.BOTH);
+            }
+        }
     }
 
     /**
@@ -154,7 +162,7 @@ public final class MyManager extends com.jasonpercus.plugincreator.EventManager 
             }
         }
         synchronized(All_ACTIONS){
-            if(event.action.equals("mute") || event.action.equals("increase") || event.action.equals("discrease")){
+            if(event.action.equals("mute") || event.action.equals("increase") || event.action.equals("discrease") || event.action.equals("show")){
                 if(!All_ACTIONS.contains(context))
                     All_ACTIONS.add(context);
             }
@@ -170,10 +178,13 @@ public final class MyManager extends com.jasonpercus.plugincreator.EventManager 
             setTitle(context, Audio.getVolume() + "%", Target.HARDWARE);
         }
         if(event.action.equals("increase")){
-            setTitle(context, Audio.getVolume() + "%", Target.HARDWARE);
+            setTitle(context, Audio.getVolume() + "%", Target.BOTH);
         }
         if(event.action.equals("discrease")){
-            setTitle(context, Audio.getVolume() + "%", Target.HARDWARE);
+            setTitle(context, Audio.getVolume() + "%", Target.BOTH);
+        }
+        if(event.action.equals("show")){
+            setTitle(context, Audio.getVolume() + "%", Target.BOTH);
         }
     }
 
@@ -192,7 +203,7 @@ public final class MyManager extends com.jasonpercus.plugincreator.EventManager 
             }
         }
         synchronized(All_ACTIONS){
-            if(event.action.equals("mute") || event.action.equals("increase") || event.action.equals("discrease")){
+            if(event.action.equals("mute") || event.action.equals("increase") || event.action.equals("discrease") || event.action.equals("show")){
                 if(All_ACTIONS.contains(context))
                     All_ACTIONS.remove(context);
             }
@@ -227,7 +238,7 @@ public final class MyManager extends com.jasonpercus.plugincreator.EventManager 
     public synchronized void volumeChangedListener(int value){
         synchronized(All_ACTIONS){
             for(Context context : All_ACTIONS){
-                setTitle(context, value + "%", Target.HARDWARE);
+                setTitle(context, value + "%", Target.BOTH);
             }
         }
     }
@@ -265,12 +276,16 @@ public final class MyManager extends com.jasonpercus.plugincreator.EventManager 
 
             JsonPrimitive increase  = obj.getAsJsonPrimitive("increaseValue");
             JsonPrimitive discrease = obj.getAsJsonPrimitive("discreaseValue");
+            JsonPrimitive set       = obj.getAsJsonPrimitive("setValue");
             
-            if(increase != null && discrease == null)
+            if(increase != null && discrease == null && set == null)
                 return increase.getAsString();
             
-            if(increase == null && discrease != null)
+            if(increase == null && discrease != null && set == null)
                 return discrease.getAsString();
+            
+            if(increase == null && discrease == null && set != null)
+                return set.getAsString();
             
             return "5";
         }

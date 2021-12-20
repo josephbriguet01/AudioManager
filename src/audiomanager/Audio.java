@@ -142,6 +142,17 @@ public final class Audio {
         return volume;
     }
     
+    /**
+     * Set windows volume
+     * @param value Corresponds to the new value of the windows sound [0, 100]
+     * @return Returns the new value of the windows sound
+     */
+    public synchronized static int set(int value){
+        setVolume(audioID, value);
+        
+        return value;
+    }
+    
     
     
 //METHODES PRIVATES STATICS
